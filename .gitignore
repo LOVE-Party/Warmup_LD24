@@ -1,0 +1,11 @@
+*~
+*.tmp
+*.old
+
+*.luac
+*.out
+*.log
+
+*.love
+*.zip
+
