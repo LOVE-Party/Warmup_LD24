@@ -183,7 +183,7 @@ local function opponent_AI(state)
 	state.turn = 2
 	menu_list.used_ability.text = ("%s used %s."):format(
 		state.monsters[2].name,
-		"atack" -- TODO real AI
+		"attack" -- TODO real AI
 	)
 	menu.next = menu_list.used_ability;
 end
@@ -238,7 +238,7 @@ menu_list = {
 				menu:change(menu_list.used_ability)
 				menu_list.used_ability.text = ("%s used %s."):format(
 					state.monsters[1].name,
-					"atack" -- TODO select abilities, eventually
+					"attack" -- TODO select abilities, eventually
 				)
 			end},
 			{"BAG", function(self, state)
