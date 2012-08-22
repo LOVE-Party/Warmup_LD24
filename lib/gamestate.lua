@@ -43,7 +43,7 @@ end
 
 local _keypressed
 function Gamestate.keypressed(key, unicode)
-	if _keypressed then _keypressed(key) end
+	if _keypressed then _keypressed(key, unicode) end
 	Gamestate.current:keypressed(key, unicode)
 end
 
