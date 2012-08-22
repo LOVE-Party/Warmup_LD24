@@ -41,6 +41,16 @@ ability {name="Bite", desc="Put pointy teeth in opponent!", type='target';
 	end;
 }
 
+ability {name="Leech", desc="Mmmm, tasty!", type='target';
+	initative = -2;
+	use=function(self, owner, target)
+		local drain = math.random(owner.strength + self.tier)
+		drain = target:drain(drain)
+		owner:restore(drain)
+		return drain
+	end;
+}
+
 ability {name="Thick Hide", desc="Other 'mon break teeth on me, ha ha!", type='passive';
 	aquire=function(self, owner, target)
 		owner.tough = owner.tough+1
@@ -50,6 +60,30 @@ ability {name="Thick Hide", desc="Other 'mon break teeth on me, ha ha!", type='p
 	end;
 }
 
+ability {name="Crush", desc="BREAK IT'S SHELL!", type='target';
+	initative = -5;
+	use=function(self, owner, target)
+		return target:damage(math.random(owner.strength + self.tier)*2)
+	end;
+}
+
+ability {name="Lean and Mean", desc="Other 'mon so slow!", type='passive';
+	aquire=function(self, owner, target)
+		owner.speed = owner.speed+1
+	end;
+	lose=function(self, owner, target)
+		owner.speed = owner.speed-1
+	end;
+}
+
+ability {name="Buffed", desc="Other 'mon so weak!", type='passive';
+	aquire=function(self, owner, target)
+		owner.strength = owner.strength+1
+	end;
+	lose=function(self, owner, target)
+		owner.strength = owner.strength-1
+	end;
+}
 
 -------------------------------------------------------------------------
 if _VERSION == "Lua 5.1" then _G[_M._NAME] = _M end

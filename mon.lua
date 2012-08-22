@@ -40,6 +40,7 @@ function _M:new(t)
 end
 
 function _M:attack(target, ability)
+	if not ability then print "using default attack" end
 	ability = ability or self.abilities[1]
 	if self:canuse(target, ability) then
 		local r = function(n) return math.random(10)+n end
@@ -71,6 +72,7 @@ function _M:hasability(ability)
 end
 
 function _M:addability(ability)
+	assert(ability, "Cannot add nil abilities")
 	assert(not self:hasability(ability), "Cannot add an ability twice")
 	self.abilities[#self.abilities+1] = ability
 	ability:aquire(self)
@@ -93,6 +95,32 @@ function _M:damage(n)
 	n = n > 0 and n or 1
 	self.health = self.health - n
 	self.health = self.health >=0 and self.health or 0
+	return n
+end
+
+function _M:drain(n)
+	assert(type(n) == 'number', "Damage must be a number")
+	assert(n >=0, "Damage must be a positive number")
+	n = n-math.random(math.ceil(self.tough/2), self.tough)
+	n = n > 0 and n or 1
+	self.energy = self.energy - n
+	self.energy = self.energy >=0 and self.energy or 0
+	return n
+end
+
+function _M:heal(n)
+	assert(type(n) == 'number', "Damage must be a number")
+	assert(n >=0, "Damage must be a positive number")
+	n = self.healthmax - self.health
+	self.health = self.health + n
+	return n
+end
+
+function _M:restore(n)
+	assert(type(n) == 'number', "Damage must be a number")
+	assert(n >=0, "Damage must be a positive number")
+	n = self.energymax - self.energy
+	self.energy = self.energy + n
 	return n
 end
 
