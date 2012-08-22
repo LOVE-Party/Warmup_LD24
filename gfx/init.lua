@@ -8,9 +8,13 @@ local landscape_y = landscape_img:getHeight()
 return {
 	landscape = {
 		image = landscape_img;
-		quad( 0,  0, 16, 16, landscape_x, landscape_y), -- grass
-		quad(17,  0, 16, 16, landscape_x, landscape_y), -- dirt
-		quad( 0, 17, 16, 16, landscape_x, landscape_y), -- rock
-		quad(17, 17, 16, 16, landscape_x, landscape_y), -- sand
+		-- Format:
+		-- {Quad, IsWalkable}
+		[0] =
+		{quad(32,  0, 16, 16, landscape_x, landscape_y), false},    -- nothing
+		{quad( 0,  0, 16, 16, landscape_x, landscape_y),  true},    -- grass
+		{quad(16,  0, 16, 16, landscape_x, landscape_y),  true},    -- dirt
+		{quad( 0, 16, 16, 16, landscape_x, landscape_y),  true},    -- rock
+		{quad(16, 16, 16, 16, landscape_x, landscape_y),  true},    -- sand
 	};
 }

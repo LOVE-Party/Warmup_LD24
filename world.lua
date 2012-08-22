@@ -1,54 +1,80 @@
-local sprites = require "gfx"
 local Gamestate = require "lib.gamestate"
+local sprites = require "gfx"
+local Player = require "player"
+
 local module = Gamestate.new()
 Gamestate.world = module
 
 module.change = 16
-
+local SIZE = 16;
 local landscape = sprites.landscape
 
 -- TODO: different levels/maps/locations
--- Yes, the map is 7x7, deal w/ it 4 now
+-- Yes, the map is 9x9, deal w/ it 4 now
+-- Or better yet, let's get started on random generation
 local map_data = {
-	1, 1, 1, 1, 1, 1, 1,
-	1, 2, 2, 2, 2, 2, 1,
-	1, 2, 3, 3, 3, 2, 1,
-	1, 2, 3, 4, 3, 2, 1,
-	1, 2, 3, 3, 3, 2, 1,
-	1, 2, 2, 2, 2, 2, 1,
-	1, 1, 1, 1, 1, 1, 1,
+	size = 81;
+	{0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 1, 1, 1, 1, 1, 1, 1, 0},
+	{0, 1, 2, 2, 0, 2, 2, 1, 0},
+	{0, 1, 2, 3, 3, 3, 2, 1, 0},
+	{0, 1, 0, 3, 4, 3, 0, 1, 0},
+	{0, 1, 2, 3, 3, 3, 2, 1, 0},
+	{0, 1, 2, 2, 0, 2, 2, 1, 0},
+	{0, 1, 1, 1, 1, 1, 1, 1, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0},
 }
 
-local batch = love.graphics.newSpriteBatch(landscape.image, #map_data)
+local batch = love.graphics.newSpriteBatch(landscape.image, map_data.size)
 batch:bind()
 local i = 0;
-for y = 0, 6 do
-	for x = 0, 6 do
-		i = i + 1;
-		batch:addq(landscape[map_data[i]], x*16, y*16)
+for y = 1, #map_data do
+	for x = 1, #map_data[y] do
+		batch:addq(landscape[map_data[y][x]][1], (x-1)*SIZE, (y-1)*SIZE)
 	end
 end
 batch:unbind();
 
+-- default starting stuff
+-- Place selected map here
+module.map = {
+	image = landscape.image;
+	raw   = landscape;
+	batch = batch;
+	data  = map_data;
+
+	x = 0;
+	y = 0;
+}
+
+module.player = Player {
+	speed = 4;  -- walk 4 blocks per second
+	steps = 8;  -- take 8 steps per block, more = smoother movement
+}
+
+module.player:random_position(module)
+
 function module:enter()
 	-- TODO: something about picking different portions of the world such as
 	-- starting in different towns
-
-	self.x = 0
-	self.y = 0
 end
 
 function module:draw()
 	local graphics = love.graphics
 	graphics.push()
-	graphics.scale(2, 2)
+	graphics.scale(2)
 
-	graphics.print(("(%d, %d)"):format(self.x, self.y), 0, 0)
-	graphics.draw(batch, self.x, self.y)
+	graphics.draw(self.map.batch, self.map.x, self.map.y)
+	self.player:draw()
 
 	graphics.pop()
 end
 
+function module:update(dt)
+	self.player:update(self, dt)
+end
+
+--[[
 function module:keypressed(key)
 	if key == "left" then
 		self.x = self.x - self.change
@@ -60,3 +86,4 @@ function module:keypressed(key)
 		self.y = self.y + self.change
 	end
 end
+]]
