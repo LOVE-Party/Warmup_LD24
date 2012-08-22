@@ -51,6 +51,15 @@ ability {name="Leech", desc="Mmmm, tasty!", type='target';
 	end;
 }
 
+ability {name="Heal", desc="I'm better now!", type='self';
+	initative = -2, cost = 2;
+	use=function(self, owner, target)
+		local heal = math.random(owner.tough + self.tier)
+		owner:heal(heal)
+		return heal
+	end;
+}
+
 ability {name="Thick Hide", desc="Other 'mon break teeth on me, ha ha!", type='passive';
 	aquire=function(self, owner, target)
 		owner.tough = owner.tough+1

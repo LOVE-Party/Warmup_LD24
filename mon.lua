@@ -39,14 +39,18 @@ function _M:new(t)
 	return m
 end
 
-function _M:attack(target, ability)
+function _M:useability(target, ability)
 	if not ability then print "using default attack" end
 	ability = ability or self.abilities[1]
+	if type(ability) == 'number' then ability = self.abilities[ability] end
+	assert(ability, "Could not find a valid ability!")
 	if self:canuse(target, ability) then
+		self.energy = self.energy - ability.cost
+		self.energy = self.energy >= 0 and self.energy or 0
 		local r = function(n) return math.random(10)+n end
 		local a, b = r(self.speed+ability.initative), target.speed+5
 		local dam = 0
-		if a > b then
+		if a > b or target == self then
 			dam = ability:use(self, target)
 		end
 		return a>b, a, b, dam
@@ -54,6 +58,8 @@ function _M:attack(target, ability)
 		return false, 0, 0, 0
 	end
 end
+
+_M.attack = _M.usability
 
 function _M:canuse(target, ability)
 	ability = ability or self.abilities[1]
