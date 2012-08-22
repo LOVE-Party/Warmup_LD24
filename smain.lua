@@ -12,7 +12,7 @@ _M.name = "Main"
 
 function _M:enter()
 	local fontimg = love.graphics.newImage("gfx/font.png")
-	local font = love.graphics.newImageFont(fontimg, "ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz`1234567890[]/\:|?,  ")
+	local font = love.graphics.newImageFont(fontimg, [[ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz`1234567890[]/\:|?,  ]])
 	love.graphics.setFont(font)
 
 	return Gamestate.switch(Gamestate.world)
@@ -27,15 +27,15 @@ function _M:draw()
 end
 
 function _M:keypressed(key, unicode)
-	
+
 end
 
 function _M:mousepressed(x, y, button)
-	
+
 end
 
 function _M:leave()
-	
+
 end
 -------------------------------------------------------------------------
 return _M
