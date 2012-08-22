@@ -5,7 +5,7 @@ local landscape_img = img("gfx/landscape.png")
 local landscape_x = landscape_img:getWidth()
 local landscape_y = landscape_img:getHeight()
 
-return {
+local sprites = {
 	landscape = {
 		image = landscape_img;
 		-- Format:
@@ -17,4 +17,15 @@ return {
 		{quad( 0, 16, 16, 16, landscape_x, landscape_y),  true},    -- rock
 		{quad(16, 16, 16, 16, landscape_x, landscape_y),  true},    -- sand
 	};
+
+	monsters = {
+		img("gfx/mon-circuloid.png"),
+		img("gfx/monster.png"),
+	};
 }
+
+-- Monsters might need to be scaled.
+sprites.monsters[1]:setFilter("nearest", "nearest")
+sprites.monsters[2]:setFilter("nearest", "nearest")
+
+return sprites

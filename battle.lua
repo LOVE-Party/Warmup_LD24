@@ -30,8 +30,10 @@ Gamestate.battle = state;
 
 local function __empty__() end
 
-local COLOR_BLACK = {0, 0, 0}
+local COLOR_BLACK = {  0,   0,   0}
 local COLOR_WHITE = {255, 255, 255}
+local COLOR_RED   = {255,   0,   0}
+local COLOR_GREEN = {  0, 255,   0}
 
 -- Used for menu_display, menu_options
 local proxy_mt = {__call = function(self, t) return setmetatable(t, {__index = self}) end}
@@ -47,8 +49,8 @@ function menu:keypressed(...)
 	return self.mode:keypressed(...)
 end
 function menu:change(mode, next)
+	local old_mode = self.mode
 	if mode then  -- start a new context
-		local old_mode = self.mode
 		self.mode = mode
 		self.next = next or old_mode;
 	else  -- leave current context
@@ -69,6 +71,7 @@ end
 local menu_display = setmetatable({
 	start = function(self)
 		self.__timer = self.timer;
+		self.exit = self.exit or __empty__
 	end,
 	draw = function(self)
 		local graphics = love.graphics
@@ -84,10 +87,17 @@ local menu_display = setmetatable({
 	update = function(self, dt)
 		self.__timer = self.__timer - dt
 		if self.__timer <= 0 then
-			menu:change()
+			self:exit(state)
+			return menu:change()
 		end
 	end,
-	keypressed = __empty__;
+	keypressed = function(self, key)
+		if key == "return" then
+			self:exit(state)
+			return menu:change()
+			-- TODO long text that needs scrolling
+		end
+	end;
 }, proxy_mt)
 
 
@@ -143,7 +153,7 @@ local menu_options = setmetatable({
 		local pos = self.__pos;
 		-- clean this up sometime
 		if key == "return" then
-			return self.list[pos][2](self)
+			return self.list[pos][2](self, state)
 		elseif key == "right" then
 			if pos == 1 or pos == 3 then
 				self.__pos = pos == 1 and 2 or 4;
@@ -168,31 +178,97 @@ local menu_options = setmetatable({
 io.stdout:setvbuf("line")
 
 local menu_list
+
+local function opponent_AI(state)
+	state.turn = 2
+	menu_list.used_ability.text = ("%s used %s."):format(
+		state.monsters[2].name,
+		"atack" -- TODO real AI
+	)
+	menu.next = menu_list.used_ability;
+end
+
+local function turn(self, state)
+	if state.turn == 1 then
+		state.turn = 2  -- It's now the opponent's turn
+		return opponent_AI(state)
+	else
+		state.turn = 1; -- It's now the player's turn
+		menu.next = menu_list.main
+	end
+end
+
 menu_list = {
 	welcome = menu_display{timer = 2, text = "Welcome!"};
 
-	attack = menu_display{timer = 2, text = "You cannot attack!"};
-	bag    = menu_display{timer = 2, text = "You have no bag!"};
-	team   = menu_display{timer = 2, text = "You are alone!"};
-	run    = menu_display{timer = 2, text = "You cannot escape!"};
+	used_ability = menu_display{
+		timer = 1; text = "";   -- set in callback
+		exit = function(self, state)
+			local hit
+			if state.turn == 1 then
+				hit = state.monsters[1]:useability(state.monsters[2])
+			else
+				hit = state.monsters[2]:useability(state.monsters[1])
+			end
+
+			if hit then
+				menu.next = menu_list.ability_hit
+			else
+				menu.next = menu_list.ability_miss
+			end
+		end;
+	};
+	ability_hit  = menu_display{
+		timer = 1; text = "It hit!";
+		exit = turn;
+	};
+	ability_miss = menu_display{
+		timer = 1; text = "It missed!";
+		exit = turn;
+	};
+	bag    = menu_display{timer = 2; text = "You have no bag!"};
+	team   = menu_display{timer = 2; text = "You are alone!"};
+	run    = menu_display{timer = 2; text = "You cannot escape!"};
 
 	main = menu_options{
 		pos = 1;
 		text = "ARE YOU READY FOR BATTLE?!";
 		list = {
-			{"ATTACK", function() menu:change(menu_list.attack) end},
-			{"BAG", function() menu:change(menu_list.bag) end},
-			{"TEAM", function() menu:change(menu_list.team) end},
-			{"RUN", function() menu:change(menu_list.run) end},
+			{"ATTACK", function(self, state)
+				menu:change(menu_list.used_ability)
+				menu_list.used_ability.text = ("%s used %s."):format(
+					state.monsters[1].name,
+					"atack" -- TODO select abilities, eventually
+				)
+			end},
+			{"BAG", function(self, state)
+				menu:change(menu_list.bag)
+			end},
+			{"TEAM", function(self, state)
+				menu:change(menu_list.team)
+			end},
+			{"RUN", function(self, state)
+				menu:change(menu_list.run)
+			end},
 		}
 	};
 }
 
+local function draw_bar(pos_x, pos_y, value, foreground_color)
+	local graphics = love.graphics
+
+	graphics.setColor(COLOR_BLACK)
+	graphics.rectangle("fill", pos_x, pos_y, 64, 8)
+	graphics.setColor(foreground_color)
+	graphics.rectangle("fill", pos_x+2, pos_y+2, value*60, 4)
+end
+
 menu:change(menu_list.welcome, menu_list.main);
 --end
 
-function state:enter()
-
+function state:enter(old_state, monsters)
+	self.monsters = monsters;
+	state.turn = 1;
 end
 
 function state:draw()
@@ -201,6 +277,25 @@ function state:draw()
 	graphics.scale(2)
 
 	menu:draw()
+
+
+	local monster
+
+	-- Player
+	-- (0, 160) 16
+	monster = self.monsters[1]
+	graphics.setColor(COLOR_WHITE)
+	graphics.draw(monster.image,  16, 88, 0, monster.scale)
+	graphics.print(monster.name, 240, 112)
+	draw_bar(240, 128, monster.health / monster.healthmax, COLOR_GREEN)
+
+
+	-- Opponent
+	monster = self.monsters[2]
+	graphics.setColor(COLOR_WHITE)
+	graphics.draw(monster.image, 240,  8, 0, monster.scale)
+	graphics.print(monster.name, 16, 32)
+	draw_bar( 16,  48, monster.health / monster.healthmax, COLOR_GREEN)
 
 	graphics.pop()
 end

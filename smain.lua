@@ -4,6 +4,8 @@
 -------------------------------------------------------------------------
 local Gamestate = require "lib.gamestate"
 local soundmanager = require "lib.soundmanager"
+local Monster = require "mon"
+local sprites = require "gfx"
 
 local _M = Gamestate.new()
 -------------------------------------------------------------------------
@@ -15,7 +17,19 @@ function _M:enter()
 	local font = love.graphics.newImageFont(fontimg, [[ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz`1234567890[]/\:|?, ]])
 	love.graphics.setFont(font)
 
-	return Gamestate.switch(Gamestate.battle)
+	local monsters = {
+		Monster:new {
+			name = "Circuloid";
+			image = sprites.monsters[1];
+			scale = 2;
+		},
+		Monster:new {
+			name = "Lafolie!";
+			image = sprites.monsters[2];
+			scale = 2;
+		},
+	}
+	return Gamestate.switch(Gamestate.battle, monsters)
 end
 
 function _M:update(dt)

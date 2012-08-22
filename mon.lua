@@ -12,12 +12,13 @@ local _MT = {__index=_M, __tostring = function(s) return s:tostring() end}
 
 function _M:new(t)
 	t = t or {}
-	m = {}
+	local m = {}
 	setmetatable(m, _MT)
 	
 	m.name      = t.name or "Circuloid"
 	m.level     = t.level or 1
-	m.image     = t.image or "mon-circuloid"
+	m.image     = t.image -- or "mon-circuloid", use values from `gfx/init.lua`
+	m.scale     = t.scale or 1
 	m.abilities =  {}
 	if t.abilities then
 		for i=1,#t.abilities do
