@@ -6,6 +6,7 @@ require "lib.soundmanager"
 --states requires
 require "intro"
 require "smain"
+require "battle"
 
 function love.load()
 	love.graphics.setBackgroundColor(50, 50, 50)
@@ -18,3 +19,8 @@ function love.load()
 	Gamestate.switch(Gamestate[(arg[2] and arg[2]:match("--state=(.+)") or "intro")])
 end
 
+function love.keypressed(key)
+	if key == "escape" then
+		love.event.quit()
+	end
+end

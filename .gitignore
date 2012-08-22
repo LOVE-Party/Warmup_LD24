@@ -9,3 +9,6 @@
 *.love
 *.zip
 
+# IDE/Texteditor project files
+.idea/
+*.iml
