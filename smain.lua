@@ -5,6 +5,7 @@
 local Gamestate = require "lib.gamestate"
 local soundmanager = require "lib.soundmanager"
 local Monster = require "mon"
+local Ability = require "abilities"
 local sprites = require "gfx"
 
 local _M = Gamestate.new()
@@ -17,16 +18,29 @@ function _M:enter()
 	local font = love.graphics.newImageFont(fontimg, [[ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz`1234567890[]/\:|?, ]])
 	love.graphics.setFont(font)
 
+	local alist = Ability.list;
 	local monsters = {
 		Monster:new {
 			name = "Circuloid";
 			image = sprites.monsters[1];
 			scale = 2;
+			abilities = {
+				alist.bite,
+				alist.leech,
+				alist.crush,
+				alist.heal,
+			}
 		},
 		Monster:new {
 			name = "Lafolie!";
 			image = sprites.monsters[2];
 			scale = 2;
+			abilities = {
+				alist.bite,
+				alist.heal,
+				alist.thick_hide,
+				alist.buffed,
+			}
 		},
 	}
 	return Gamestate.switch(Gamestate.battle, monsters)
