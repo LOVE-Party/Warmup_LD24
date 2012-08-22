@@ -198,7 +198,7 @@ end
 function state:draw()
 	local graphics = love.graphics
 	graphics.push()
-	graphics.scale(2,2)
+	graphics.scale(2)
 
 	menu:draw()
 
