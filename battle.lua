@@ -181,10 +181,25 @@ local menu_list
 
 local function opponent_AI(state)
 	state.turn = 2
+	local me  = state.monsters[2]
+	local target = state.monsters[1]
+	local options = {}
+	for k, v in pairs(me.abilities) do
+		if v.type == 'self' and me:canuse(me, v) then
+			options[#options+1] = v
+		elseif v.type == 'target' and me:canuse(target, v) then
+			options[#options+1] = v
+		end
+	end
+	local action = options[math.random(1,#options)]
+	assert(action, "Why don't I have a valid action?")
+	
 	menu_list.used_ability.text = ("%s used %s."):format(
-		state.monsters[2].name,
-		"attack" -- TODO real AI
+		me.name,
+		action.name
 	)
+	menu_list.used_ability.action = action
+	state.action = action
 	menu.next = menu_list.used_ability;
 end
 
@@ -202,35 +217,44 @@ menu_list = {
 	welcome = menu_display{timer = 2, text = "Welcome!"};
 
 	used_ability = menu_display{
+		name = 'used_ability';
 		timer = 1; text = "";   -- set in callback
 		exit = function(self, state)
-			local hit
-			if state.turn == 1 then
-				hit = state.monsters[1]:useability(state.monsters[2])
-			else
-				hit = state.monsters[2]:useability(state.monsters[1])
-			end
+			print(self.name)
+			local hit, attacker, defender
+			local action = self.action
+			assert(action, "Why don't I have a valid action?")
 
-			if hit then
-				menu.next = menu_list.ability_hit
+			if state.turn == 1 then
+				attacker, defender = state.monsters[1], state.monsters[2]
 			else
-				menu.next = menu_list.ability_miss
+				attacker, defender = state.monsters[2], state.monsters[1]
 			end
+				hit = attacker:useability(defender, action)
+				
+				menu_list.ability_result.text = string.format("%s %s!", action.name, hit and 'hit' or 'missed')
+				menu.next = menu_list.ability_result
 		end;
 	};
-	ability_hit  = menu_display{
-		timer = 1; text = "It hit!";
-		exit = turn;
+	
+	ability_result  = menu_display{
+		name = 'ability_result';
+		timer = 1; text = "It was used!";
+		exit = function(self, ...)
+			self.text="BADSTRREF"
+			turn(self, ...)
+		end
 	};
-	ability_miss = menu_display{
-		timer = 1; text = "It missed!";
-		exit = turn;
-	};
-	bag    = menu_display{timer = 2; text = "You have no bag!"};
-	team   = menu_display{timer = 2; text = "You are alone!"};
-	run    = menu_display{timer = 2; text = "You cannot escape!"};
+	
+	bag    = menu_display{timer = 2;
+		name = 'bag'; text = "You have no bag!"};
+	team   = menu_display{timer = 2;
+		name = 'team';  text = "You are alone!"};
+	run    = menu_display{timer = 2;
+		name = 'run';  text = "You cannot escape!"};
 
 	main = menu_options{
+		name = 'menu_options'; 
 		pos = 1;
 		text = "ARE YOU READY FOR BATTLE?!";
 		list = {
