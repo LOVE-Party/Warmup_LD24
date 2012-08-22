@@ -230,10 +230,10 @@ menu_list = {
 			else
 				attacker, defender = state.monsters[2], state.monsters[1]
 			end
-				hit = attacker:useability(defender, action)
+			hit = attacker:useability(defender, action)
 				
-				menu_list.ability_result.text = string.format("%s %s!", action.name, hit and 'hit' or 'missed')
-				menu.next = menu_list.ability_result
+			menu_list.ability_result.text = string.format("%s %s!", action.name, hit and 'hit' or 'missed')
+			menu.next = menu_list.ability_result
 		end;
 	};
 	
