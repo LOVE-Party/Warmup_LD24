@@ -7,6 +7,7 @@ require "lib.soundmanager"
 require "intro"
 require "smain"
 require "battle"
+require "world"
 
 function love.load()
 	love.graphics.setBackgroundColor(50, 50, 50)
