@@ -15,7 +15,7 @@ function _M:enter()
 	local font = love.graphics.newImageFont(fontimg, "ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+abcdefghijklmnopqrstuvwxyz`1234567890[]/\:|?,  ")
 	love.graphics.setFont(font)
 
-	return Gamestate.switch(Gamestate.battle)
+	return Gamestate.switch(Gamestate.world)
 end
 
 function _M:update(dt)
