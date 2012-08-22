@@ -1,4 +1,4 @@
-	--[[
+--[[
 The fun math for figuring the screen size.
 
 320x240
@@ -251,11 +251,24 @@ io.stdout:setvbuf("line")
 local menu_list
 
 local function AI_React(state)
-	state.turn = 2
+	local me  = state.monsters[2]
+	local target = state.monsters[1]
+	local options = {}
+	for k, v in pairs(me.abilities) do
+		if v.type == 'self' and me:canuse(me, v) then
+			options[#options+1] = v
+		elseif v.type == 'target' and me:canuse(target, v) then
+			options[#options+1] = v
+		end
+	end
+	local ability = options[math.random(1,#options)]
+	assert(ability, "Why don't I have a valid action?")
+
 	menu_list.used_ability.display.text = ("%s used %s."):format(
-		state.monsters[2].name,
-		"attack" -- TODO real AI
+		me.name,
+		ability.name
 	)
+	menu_list.used_ability.display.ability = ability
 	menu.next = menu_list.used_ability;
 end
 
@@ -279,12 +292,15 @@ menu_list = {
 		display = menu_display{
 			timer = 1; text = "";   -- set in callback
 			exit = function(self, state)
-				local hit
+				local hit, attacker, defender
 				if state.turn == 1 then
-					hit = state.monsters[1]:useability(state.monsters[2])
+					attacker, defender = state.monsters[1], state.monsters[2]
 				else
-					hit = state.monsters[2]:useability(state.monsters[1])
+					attacker, defender = state.monsters[2], state.monsters[1]
 				end
+
+				local ability = self.ability
+				hit = attacker:useability(defender, ability)
 
 				if hit then
 					menu.next = menu_list.ability_hit
@@ -343,13 +359,15 @@ menu_list = {
 				end;
 				list = {
 					func = function(self, n) -- general callback
+						local ability = state.monsters[1].abilities[self.__pos]
 						menu_list.used_ability.display.text = ("%s used %s."):format(
 							state.monsters[1].name,
-							state.monsters[1].abilities[self.pos].name
+							ability.name
 						)
+						menu_list.used_ability.display.ability = ability;
 						menu:change(menu_list.used_ability)
 					end,
-					{"ATTACK", __empty__},  -- individual callbacks ignored
+					{"", __empty__},  -- individual callbacks ignored
 					{"", __empty__},
 					{"", __empty__},
 					{"", __empty__},

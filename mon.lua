@@ -64,6 +64,8 @@ _M.attack = _M.usability
 
 function _M:canuse(target, ability)
 	ability = ability or self.abilities[1]
+	if type(ability) == 'number' then ability = self.abilities[ability] end
+	assert(ability, "Could not find a valid ability!")
 	if self.energy < ability.cost then
 		return false, 'expensive'
 	end
