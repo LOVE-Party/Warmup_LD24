@@ -32,7 +32,7 @@ function _M:enter()
 			}
 		},
 		Monster:new {
-			name = "Lafolie!";
+			name = "Tyran";
 			image = sprites.monsters[2];
 			scale = 2;
 			abilities = {
