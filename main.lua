@@ -6,6 +6,8 @@ require "intro"
 require "smain"
 require "battle"
 require "world"
+require "scredits"
+
 
 local dbgfont
 function love.load()
