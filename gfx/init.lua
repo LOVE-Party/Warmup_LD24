@@ -19,8 +19,8 @@ local sprites = {
 	};
 
 	monsters = {
-		img("gfx/mon-circuloid.png"),
-		img("gfx/monster.png"),
+		img("gfx/monsters/circuloid.png"),
+		img("gfx/monsters/tyran.png"),
 	};
 }
 

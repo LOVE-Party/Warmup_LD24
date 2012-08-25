@@ -27,7 +27,7 @@ _M.options = {
 					alist.heal,
 				}
 			},
-			Monster:new {name = "Lafolie!"; scale = 2;
+			Monster:new {name = "Tyran"; scale = 2;
 				image = sprites.monsters[2];
 				abilities = {
 					alist.bite,
@@ -62,7 +62,7 @@ function _M:enter()
 	love.graphics.setFont(font)
 	self.font = font
 
-	self.logo = love.graphics.newImage('gfx/mon-circuloid.png')
+	self.logo = love.graphics.newImage('gfx/monsters/circuloid.png')
 	self.logo:setFilter('nearest', 'nearest')
 end
 
