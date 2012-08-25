@@ -1,6 +1,4 @@
---package.path = package.path .. ";./?/init.lua"
 require "lib.gamestate"
---require("utils")
 require "lib.soundmanager"
 
 --states requires
@@ -9,8 +7,10 @@ require "smain"
 require "battle"
 require "world"
 
+local dbgfont
 function love.load()
 	love.graphics.setBackgroundColor(50, 50, 50)
+	dbgfont = love.graphics.newFont(10)
 
 	--Set Random Seed
 	math.randomseed(os.time());
@@ -25,3 +25,16 @@ function love.keypressed(key)
 		love.event.quit()
 	end
 end
+
+function love.draw()
+		local lg = love.graphics
+	do -- Horribly overwrought FPS counter.
+		local lt = love.timer
+		local fps, fdt, avg = lt.getFPS(), lt.getDelta()
+		avg = 1/fps
+		lg.setFont(dbgfont)
+		lg.setColor(255,255,255)
+		lg.print(string.format("%03dfps (%4.3fms/frame, last: %4.3fms)", fps, avg, fdt), 5, 5);
+	end
+end
+
