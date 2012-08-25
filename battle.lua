@@ -388,12 +388,14 @@ menu:change(menu_list.welcome, menu_list.main);
 --end
 
 function state:enter(old_state, monsters)
+	self.font = love.graphics.getFont()
 	self.monsters = monsters;
 	state.turn = 1;
 end
 
 function state:draw()
 	local graphics = love.graphics
+	graphics.setFont(self.font)
 	graphics.push()
 	graphics.scale(2)
 
