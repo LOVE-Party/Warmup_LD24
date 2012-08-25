@@ -54,7 +54,7 @@ function _M:useability(target, ability)
 		if a > b or target == self then
 			dam = ability:use(self, target)
 		end
-		return a>b, a, b, dam
+		return a > b or target == self, a, b, dam
 	else
 		return false, 0, 0, 0
 	end
